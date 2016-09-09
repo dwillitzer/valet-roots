@@ -166,8 +166,10 @@ else
 	wp rewrite structure '/%postname%/' --hard
 	wp rewrite flush --hard
 
-	composer create-project roots/sage web/app/themes/$sitename dev-master 
-	wp theme activate $sitename
+	themepath=web/app/themes/$sitename
+	composer create-project roots/sage $themepath dev-master
+	cd $themepath 
+	npm install
 
 	clear
 
