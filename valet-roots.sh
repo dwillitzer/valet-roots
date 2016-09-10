@@ -23,6 +23,10 @@ read -e sitetitle
 echo "Add Pages: "
 read -e allpages
 
+# add sage theme?
+echo "Want to install roots.io sage them? (y/n)"
+read -e sagetheme
+
 # add a simple yes/no confirmation before we proceed
 echo "Run Install? (y/n)"
 read -e run
@@ -166,10 +170,14 @@ else
 	wp rewrite structure '/%postname%/' --hard
 	wp rewrite flush --hard
 
-	themepath=web/app/themes/$sitename
-	composer create-project roots/sage $themepath dev-master
-	cd $themepath 
-	npm install
+	if [[ "$sagetheme" == y ]]; then
+		themepath=web/app/themes/$sitename
+		composer create-project roots/sage $themepath dev-master
+		cd $themepath 
+		npm install
+		npm run build
+		wp theme activate $sitename
+	fi
 
 	clear
 
