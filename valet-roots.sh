@@ -136,9 +136,8 @@ fi
 	mysql -u root -e "DROP DATABASE IF EXISTS $dbname"
 	
 	# install bedrock
-	cd $HOME/sites/valet
-	wp valet new $sitename --project=bedrock --admin_user=$wpuser --admin_password=$wppass --admin_email=$wpemail
-	cd $cwd && wp dotenv salts regenerate --file=.env && wp dotenv list
+	wp valet new $sitename --project=bedrock --in=$path --admin_user=$wpuser --admin_password=$wppass --admin_email=$wpemail
+	cd $cwd && wp dotenv salts generate && wp dotenv list
 
 	# discourage search engines
 	wp option update blog_public 0
@@ -175,23 +174,19 @@ fi
 	# assign navigaiton to primary location
 	wp menu location assign main-navigation primary
 	# set pretty urls
-	wp rewrite structure '/%postname%/' --hard
-	wp rewrite flush --hard
-
-
+	wp rewrite structure '/%postname%/'
+	wp rewrite flush
 
 	# delete akismet and hello dolly
-	wp plugin delete akismet hello
-	wp theme delete twentyfifteen twentyfourteen twentythirteen twentytwelve twentyeleven twentyten
+	wp plugin delete akismet hello	
 	
 	# install automated login magic links
-	wp login install --activate
-
+	composer require aaemnnosttv/wp-cli-login-server && wp login toggle on
 
 
 	if [[ "$sagetheme" == y ]]; then
 		
-		composer create-project roots/sage $themepath dev-master
+		composer create-project roots/sage $themepath dev-master --yes
 		cd $themepath 
 		npm -s install
 		sed "s/http://example.dev/$(wp dotenv get WP_HOME --path=$cwd)/g"
@@ -199,7 +194,6 @@ fi
 		wp theme activate $sitename
 
 	fi
-
 
 	clear
 
